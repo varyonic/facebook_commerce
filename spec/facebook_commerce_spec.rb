@@ -1,11 +1,14 @@
-# frozen_string_literal: true
+require 'webmock/rspec'
 
 RSpec.describe FacebookCommerce do
   it "has a version number" do
     expect(FacebookCommerce::VERSION).not_to be nil
   end
 
-  let(:config) { { cms_id: '123', access_token: 'abc' } }
+  let(:access_token) { SecureRandom.hex(16) }
+  let(:cms_id) { rand 0..99999 }
+  let(:config) { { cms_id: cms_id, access_token: access_token } }
+  let(:endpoint) { "https://graph.facebook.com" }
 
   describe described_class::OrderApi do
     subject { described_class.new(config) }
@@ -15,7 +18,8 @@ RSpec.describe FacebookCommerce do
       let(:response) { { data: 'orders' }.to_json }
       
       before do
-        allow(subject).to receive(:send_request).and_return(response)
+        stub_request(:get, "#{endpoint}/#{cms_id}/commerce_orders?access_token=#{access_token}&state=CREATED")
+          .to_return(status: 200, body: response)
       end
       
       it 'returns the orders' do
@@ -28,7 +32,8 @@ RSpec.describe FacebookCommerce do
       let(:response) { { id: order_id }.to_json }
       
       before do
-        allow(subject).to receive(:send_request).and_return(response)
+        stub_request(:get, "#{endpoint}/#{order_id}?access_token=#{access_token}")
+          .to_return(status: 200, body: response)
       end
 
       it 'returns the order' do
@@ -44,7 +49,9 @@ RSpec.describe FacebookCommerce do
       let(:response) { { success: true }.to_json }
 
       before do
-        allow(subject).to receive(:send_request).and_return(response)
+        stub_request(:post, "#{endpoint}/#{cms_id}/order_management_apps")
+               .with(body: "access_token=#{access_token}")
+          .to_return(status: 200, body: response)
       end
 
       it 'returns the result' do
@@ -57,7 +64,8 @@ RSpec.describe FacebookCommerce do
       let(:response) { { state: 'IN_PROGRESS' }.to_json }
       
       before do
-        allow(subject).to receive(:send_request).and_return(response)
+        stub_request(:post, "#{endpoint}/#{order_id}/acknowledge_order")
+          .to_return(status: 200, body: response)
       end
 
       it 'returns the result' do
@@ -74,7 +82,8 @@ RSpec.describe FacebookCommerce do
       let(:response) { { success: true }.to_json }
       
       before do
-        allow(subject).to receive(:send_request).and_return(response)
+        stub_request(:post, "#{endpoint}/#{order_id}/shipments")
+          .to_return(status: 200, body: response)
       end
 
       it 'returns the result' do
@@ -91,7 +100,8 @@ RSpec.describe FacebookCommerce do
       let(:response) { { success: true }.to_json }
       
       before do
-        allow(subject).to receive(:send_request).and_return(response)
+        stub_request(:post, "#{endpoint}/#{order_id}/cancellations")
+          .to_return(status: 200, body: response)
       end
 
       it 'returns the result' do
@@ -104,7 +114,8 @@ RSpec.describe FacebookCommerce do
       let(:response) { { success: true }.to_json }
       
       before do
-        allow(subject).to receive(:send_request).and_return(response)
+        stub_request(:post, "#{endpoint}/#{order_id}/refunds")
+          .to_return(status: 200, body: response)
       end
 
       it 'returns the result' do
@@ -121,7 +132,8 @@ RSpec.describe FacebookCommerce do
       let(:response) { { id: '1234567890' }.to_json }
       
       before do
-        allow(subject).to receive(:send_request).and_return(response)
+        stub_request(:post, "#{endpoint}/#{order_id}/returns")
+          .to_return(status: 200, body: response)
       end
 
       it 'returns the result' do
@@ -134,7 +146,8 @@ RSpec.describe FacebookCommerce do
       let(:response) { { success: true }.to_json }
       
       before do
-        allow(subject).to receive(:send_request).and_return(response)
+        stub_request(:post, "#{endpoint}/#{return_id}/update_return")
+          .to_return(status: 200, body: response)
       end
 
       it 'returns the result' do
