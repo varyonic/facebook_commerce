@@ -2,17 +2,14 @@
 
 Unofficial Ruby wrapper for the Facebook Commerce API.
 
-## Installation
+[![Version         ][rubygems_badge]][rubygems]
+[![Github Actions  ][actions_badge]][actions]
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+## Installation
 
 Install the gem and add to the application's Gemfile by executing:
 
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
-
-If bundler is not being used to manage dependencies, install the gem by executing:
-
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+    $ bundle add facebook_commerce
 
 ## Usage
 
@@ -31,3 +28,8 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/varyon
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+
+[rubygems_badge]: http://img.shields.io/gem/v/facebook_commerce.svg
+[rubygems]: https://rubygems.org/gems/facebook_commerce
+[actions_badge]: https://github.com/varyonic/facebook_commerce/workflows/main/badge.svg
+[actions]: https://github.com/varyonic/facebook_commerce/actions
