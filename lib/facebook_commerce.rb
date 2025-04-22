@@ -166,7 +166,7 @@ module FacebookCommerce
     # @return [Hash] Return response, eg. { id: '1234567890' }
     def create_return(order_id, items, return_status, return_message, merchant_return_id)
       data = {
-        items: items.to_json,
+        items: CGI.escape(JSON.generate items),
         return_status: return_status,
         return_message: return_message,
         merchant_return_id: merchant_return_id

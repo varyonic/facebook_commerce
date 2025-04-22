@@ -107,6 +107,7 @@ RSpec.describe FacebookCommerce do
     describe '#create_return' do
       before do
         stub_request(:post, "#{endpoint}/#{order_id}/returns")
+          .with(body: /items=%5B/)
           .to_return(status: 200, body: JSON.generate(id: '1234567890'))
       end
 
