@@ -22,7 +22,22 @@ module FacebookCommerce
   class Api
     class UnexpectedHttpResponse < StandardError
       def initialize(response)
-        super response.message || response.code
+        message = response.message || response.code
+        
+        # Try to extract error_user_msg from Facebook API response
+        if response.body && !response.body.empty?
+          begin
+            parsed_body = JSON.parse(response.body)
+            error_user_msg = parsed_body.dig('error', 'error_user_msg')
+            if error_user_msg
+              message = "#{message}: #{error_user_msg}"
+            end
+          rescue JSON::ParserError
+            # If JSON parsing fails, just use the original message
+          end
+        end
+        
+        super message
       end
     end
     

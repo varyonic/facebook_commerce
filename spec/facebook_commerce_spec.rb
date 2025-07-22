@@ -129,4 +129,55 @@ RSpec.describe FacebookCommerce do
       end
     end
   end
+
+  describe FacebookCommerce::Api::UnexpectedHttpResponse do
+    let(:response_without_body) { double('response', message: 'Bad Request', code: '400', body: nil) }
+    let(:response_with_empty_body) { double('response', message: 'Bad Request', code: '400', body: '') }
+    let(:response_with_error_msg) { 
+      double('response', 
+        message: 'Bad Request', 
+        code: '400', 
+        body: JSON.generate({ error: { error_user_msg: 'We were unable to approve this return request' } })
+      )
+    }
+    let(:response_with_invalid_json) { double('response', message: 'Bad Request', code: '400', body: 'invalid json') }
+
+    it 'uses response message when no body is present' do
+      error = FacebookCommerce::Api::UnexpectedHttpResponse.new(response_without_body)
+      expect(error.message).to eq('Bad Request')
+    end
+
+    it 'uses response message when body is empty' do
+      error = FacebookCommerce::Api::UnexpectedHttpResponse.new(response_with_empty_body)
+      expect(error.message).to eq('Bad Request')
+    end
+
+    it 'appends error_user_msg when present in response body' do
+      error = FacebookCommerce::Api::UnexpectedHttpResponse.new(response_with_error_msg)
+      expect(error.message).to eq('Bad Request: We were unable to approve this return request')
+    end
+
+    it 'uses response message when JSON parsing fails' do
+      error = FacebookCommerce::Api::UnexpectedHttpResponse.new(response_with_invalid_json)
+      expect(error.message).to eq('Bad Request')
+    end
+  end
+
+  describe 'error handling in API responses' do
+    let(:bad_request_response) do
+      double('response',
+        message: 'Bad Request',
+        code: '400',
+        body: JSON.generate({ error: { error_user_msg: 'We were unable to approve this return request' } })
+      )
+    end
+
+    it 'raises UnexpectedHttpResponse with error_user_msg when API returns 400' do
+      api = FacebookCommerce::Api.new(config)
+      
+      expect {
+        api.send(:fail_unless_expected_response, bad_request_response, Net::HTTPSuccess)
+      }.to raise_error(FacebookCommerce::Api::UnexpectedHttpResponse, 'Bad Request: We were unable to approve this return request')
+    end
+  end
 end
